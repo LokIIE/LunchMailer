@@ -14,10 +14,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-const port = 5000;
+const port = 80;
 
-app.use(favicon(path.join(__dirname, 'assets', 'lunch.ico')))
-app.use(bodyParser.json());
+app.use(favicon(path.join(__dirname, 'assets', 'lunch.ico')));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // This is where all the magic happens!
@@ -46,8 +45,8 @@ app.get('/formulaire', (req, res) => {
 });
 
 app.post('/formulaire', (req, res) => {
-  sendMail(req, res);
-  res.render('formulaire', { message: "Message sent" });
+  const status = sendMail(req, res);
+  res.render('formulaire', { message: status });
 });
 
 app.use(function(req, res) {
@@ -83,21 +82,30 @@ const transporter = nodemailer.createTransport({
 /*** SEND MAIL ***/
 function sendMail(req, res) {
   console.log(req.body);
+  let { to, choices } = req.body;
 
-  const { to } = req.body;
-  const choices = mockFormData;
+  if (!to.trim()) {
+    return "Veuillez renseigner un destinataire";
+  }
+  
+  console.log(choices);
+
+  if (!choices) {
+    choices = mockFormData.slice();
+  }
 
   res.render(
     'email',
     {
       choices: choices,
-      finalChoice: 'PIZZA'
+      counts: formatCounts(computeCounts(choices)),
+      finalChoice: computeFinalChoice(choices)
     },
     (err, htmlMail) => {
     // send mail with defined transport object
     transporter.sendMail({
       from: process.env.user,
-      to: to,
+      to: to.trim(),
       subject: "LunchMailer - le choix du jour",
       html: htmlMail,
     }, 
@@ -109,31 +117,75 @@ function sendMail(req, res) {
       res.status(200).send();
     });
   });
+
+  return "Message envoyé";
+}
+
+function computeCounts(choices) {
+  const counts = {};
+
+  for (let i = 0; i < choices.length; i++) {
+    const choice = choices[i];
+    if (!counts[choice.value]) {
+      counts[choice.value] = 1;
+    } else {
+      counts[choice.value] += 1;
+    }
+  }
+
+  return counts;
+}
+
+function formatCounts(counts) {
+  const result = []
+
+  for (let choice in counts) {
+    result.push({
+      choice,
+      value: counts[choice]
+    });
+  }
+
+  return result;
+}
+
+function computeFinalChoice(choices) {
+  const counts = computeCounts(choices);
+  
+  let results = [];
+  let maxCount = 0;
+
+  for (let choice in counts) {
+    if (counts[choice] > maxCount) {
+      maxCount = counts[choice];
+      results = [choice];
+    } else if (counts[choice] === maxCount) {
+      results.push(choice);
+    }
+  }
+
+  return results.join(' ou ');
 }
 
 const mockFormData = [
   {
-    name: 'Srivatsan',
-    choice: 'Chinois'
+    name: 'Damien',
+    value: 'Chinois'
   },
   {
     name: 'Adrien',
-    choice: 'Italien'
+    value: 'Italien'
   },
   {
-    name: 'Karen',
-    choice: 'Italien'
+    name: 'Valentine',
+    value: 'Italien'
   },
   {
-    name: 'Laurent',
-    choice: 'Boulangerie'
+    name: 'Kevin',
+    value: 'Boulangerie'
   },
   {
-    name: 'Eric',
-    choice: 'Chinois'
+    name: 'Lucie',
+    value: 'Chinois'
   },
-  {
-    name: 'Marine',
-    choice: 'Boulangerie'
-  }
 ];

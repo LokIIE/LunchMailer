@@ -329,6 +329,10 @@
           border-color: #34495e !important; 
         } 
       }
+
+      .result td {
+        padding: 0px 20px;
+      }
     </style>
   </head>
 
@@ -349,22 +353,42 @@
                     <tr>
                       <td>
                         <p>Bonjour,</p>
-                        <p>Un sondage a été réalisé pour le repas de ce midi, et ce midi .... ce sera {{ finalChoice }} !</p>
-                        <table>
+                        <p>Un sondage a été réalisé pour le repas de ce midi, et ce midi .... ce sera <strong><u>{{ finalChoice }}</u></strong> !</p>
+                        <h3>Décompte des votes</h3>
+                        <table class="result">
                           <thead>
-                            <th>Nom</th>
-                            <th>Choix</th>
+                            <th>Proposition</th>
+                            <th>Nombre de votes</th>
                           </thead>
                           <tbody>
-                            {% for choix in choices %}
+                            {% for count in counts %}
                               <tr>
-                                <td>{{ choix.name }}</td>
-                                <td>{{ choix.choice }}</td>
+                                <td>{{ count.choice }}</td>
+                                <td>{{ count.value }}</td>
                               </tr>
                             {% endfor %}
                           </tbody>
                         </table>
-                        <p>Bon appétit !</p>
+
+                        <h2 style="padding-top: 20px;">Bon appétit !</h2>
+
+                        <div style="padding-top: 20px;">
+                          <h5>Détail des votes</h5>
+                          <table class="result">
+                            <thead>
+                              <th>Nom</th>
+                              <th>Choix</th>
+                            </thead>
+                            <tbody>
+                              {% for choix in choices %}
+                                <tr>
+                                  <td>{{ choix.name }}</td>
+                                  <td>{{ choix.value }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
                       </td>
                     </tr>
                   </table>
