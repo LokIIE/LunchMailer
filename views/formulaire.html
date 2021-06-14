@@ -2,11 +2,16 @@
 
 <html>
   <head>
-    <title>Formulaire</title>
+    <title>LunchMailer - On mange où ?</title>
   </head>
   <body>
     <form role="form" action="/formulaire" method="post">
+      <input type="text" name="to" />
       <button type="submit" id="submit" class="btn btn-default">Envoyer</button>
     </form>
+
+    {{ message }}
   </body>
 </html>
+
+    
