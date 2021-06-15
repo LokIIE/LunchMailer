@@ -49,9 +49,8 @@ app.post('/formulaire', (req, res) => {
   res.render('formulaire', { message: status });
 });
 
-app.post('/mockFormulaire', (req, res) => {
-  const status = sendMail(req, res, mockFormData);
-  res.render('formulaire', { message: status });
+app.get('/mockFormulaire', (req, res) => {
+  sendMail(req, res, true);
 });
 
 app.use(function(req, res) {
@@ -86,14 +85,17 @@ const transporter = nodemailer.createTransport({
 
 /*** SEND MAIL ***/
 function sendMail(req, res, mockData) {
-  let { to, choices } = req.body;
-
-  if (!to || !to.trim()) {
-    return "Veuillez renseigner un destinataire";
-  }
-
+  let to, choices;
   if (!!mockData) {
+    to = process.env.user;
     choices = mockFormData.slice();
+  } else {
+    to = req.body.to;
+    choices = req.body.choices;
+
+    if (!to || !to.trim()) {
+      return "Veuillez renseigner un destinataire";
+    }
   }
 
   res.render(
