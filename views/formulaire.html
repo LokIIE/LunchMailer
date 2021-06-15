@@ -4,10 +4,21 @@
   <head>
     <title>LunchMailer - On mange où ?</title>
   </head>
+  
   <body>
-    <form role="form" action="/formulaire" method="post">
-      <input type="text" name="to" />
+    <form id="myForm" method="post" action="/formulaire">
+      <input type="text" name="to" value="" />
+      
       <br/>
+
+      <input type="text" name="choices[0][name]" value="Tom" />
+      <input type="text" name="choices[0][value]" value="Italien" />
+      <br/>
+      <input type="text" name="choices[1][name]" value="Matthieu" />
+      <input type="text" name="choices[1][value]" value="Kebab" />
+
+      <br/>
+
       <button type="submit" id="submit" class="btn btn-default">Envoyer</button>
     </form>
 

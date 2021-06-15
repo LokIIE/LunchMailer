@@ -14,10 +14,10 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-const port = 80;
+const port = process.env.PORT || 5000;
 
 app.use(favicon(path.join(__dirname, 'assets', 'lunch.ico')));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // This is where all the magic happens!
 app.engine('html', swig.renderFile);
@@ -46,6 +46,11 @@ app.get('/formulaire', (req, res) => {
 
 app.post('/formulaire', (req, res) => {
   const status = sendMail(req, res);
+  res.render('formulaire', { message: status });
+});
+
+app.post('/mockFormulaire', (req, res) => {
+  const status = sendMail(req, res, mockFormData);
   res.render('formulaire', { message: status });
 });
 
@@ -80,17 +85,14 @@ const transporter = nodemailer.createTransport({
 });
 
 /*** SEND MAIL ***/
-function sendMail(req, res) {
-  console.log(req.body);
+function sendMail(req, res, mockData) {
   let { to, choices } = req.body;
 
-  if (!to.trim()) {
+  if (!to || !to.trim()) {
     return "Veuillez renseigner un destinataire";
   }
-  
-  console.log(choices);
 
-  if (!choices) {
+  if (!!mockData) {
     choices = mockFormData.slice();
   }
 
