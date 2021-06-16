@@ -47,7 +47,7 @@ app.get('/formulaire', (req, res) => {
 app.post('/formulaire', (req, res) => {
   const status = sendMail(req, res);
   // res.render('formulaire', { message: status });
-  res.status(200).send();
+  res.status(204).send();
 });
 
 app.get('/mockFormulaire', (req, res) => {
